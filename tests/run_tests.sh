@@ -17,9 +17,9 @@ for test_file in "$SCRIPT_DIR"/test_*.sh; do
     if [ -f "$test_file" ]; then
         echo "Running $(basename "$test_file")..."
         if /bin/bash "$test_file"; then
-            ((total_passed++))
+            total_passed=$((total_passed + 1))
         else
-            ((total_failed++))
+            total_failed=$((total_failed + 1))
         fi
         echo ""
     fi
