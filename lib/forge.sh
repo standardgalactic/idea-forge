@@ -198,11 +198,6 @@ forge_list_templates() {
         local template_name
         template_name=$(basename "$template_dir")
         
-        local template_id=""
-        if [ -f "$template_dir/template.env" ]; then
-            template_id=$(grep "^TEMPLATE_ID=" "$template_dir/template.env" | cut -d= -f2-)
-        fi
-        
         local description="No description available"
         if [ -f "$template_dir/README.md" ]; then
             # Extract first non-header line as description
