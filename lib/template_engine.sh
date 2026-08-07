@@ -71,7 +71,8 @@ validate_template() {
     fi
     
     # Check template function exists
-    local fn_name="template_apply_$(_template_to_fn "$template")"
+    local fn_name
+    fn_name="template_apply_$(_template_to_fn "$template")"
     if ! declare -f "$fn_name" >/dev/null 2>&1; then
         err "Template function not found: $fn_name"
         err "Templates must implement: ${fn_name}(repo, repo_path, package, title, description)"
@@ -147,7 +148,8 @@ apply_template() {
     local title="$5"
     local description="$6"
 
-    local fn="template_apply_$(_template_to_fn "$template")"
+    local fn
+    fn="template_apply_$(_template_to_fn "$template")"
     if ! declare -f "$fn" >/dev/null 2>&1; then
         err "Template implementation missing for: $template"
         exit 1

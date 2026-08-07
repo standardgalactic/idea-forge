@@ -2,9 +2,13 @@
 
 set -euo pipefail
 
+# shellcheck disable=SC2034 # shared defaults consumed by sourcing scripts
 FORGE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck disable=SC2034 # shared defaults consumed by sourcing scripts
 DEFAULT_OWNER="standardgalactic"
+# shellcheck disable=SC2034 # shared defaults consumed by sourcing scripts
 DEFAULT_ROOT="${HOME}/github"
+# shellcheck disable=SC2034 # shared defaults consumed by sourcing scripts
 DEFAULT_BRANCH="main"
 
 log() { printf '%s\n' "$*"; }
@@ -23,9 +27,11 @@ slug_to_pkg() {
 
 csv_to_array() {
     local input="$1"
+    # shellcheck disable=SC2034 # nameref is assigned via read -a below
     local -n out_ref="$2"
     out_ref=()
     [ -z "$input" ] && return
+    # shellcheck disable=SC2034 # nameref receives data from read -a
     IFS=',' read -r -a out_ref <<<"$input"
 }
 

@@ -373,7 +373,8 @@ apply_starter_pack() {
     local starter_pack="$1" repo_path="$2" package="$3"
     [ -z "$starter_pack" ] && return
 
-    local fn="starter_pack_$(echo "$starter_pack" | tr '-' '_')"
+    local fn
+    fn="starter_pack_$(echo "$starter_pack" | tr '-' '_')"
     if ! declare -f "$fn" >/dev/null 2>&1; then
         err "Starter pack not found: $starter_pack"
         exit 1

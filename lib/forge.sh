@@ -30,7 +30,7 @@ forge_prepare_repo_dir() {
     mkdir -p "$path"
 
     (
-        cd "$path"
+        cd "$path" || exit
         git init --initial-branch="$branch" >/dev/null
         if [ "$enable_github" = "1" ]; then
             git remote add origin "git@github.com:$owner/$repo.git"
@@ -90,7 +90,7 @@ forge_commit_and_push() {
     local repo_path="$1" branch="$2" enable_github="$3"
 
     (
-        cd "$repo_path"
+        cd "$repo_path" || exit
         git add .
         if ! git diff --cached --quiet; then
             git commit -m "Establish template-driven project structure" >/dev/null
