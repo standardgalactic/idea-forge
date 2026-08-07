@@ -1,18 +1,42 @@
-# idea-forge
+idea-forge
 
 Template-driven repository forge for research organizations.
 
-## What changed
+Overview
 
-This project now behaves like a small build system for repository bootstrapping:
+Idea Forge is a repository generation system for creating consistent, well-documented research and software projects from reusable templates. Rather than manually repeating the same setup process for every new repository, projects are described through structured metadata and assembled from composable templates that define language support, documentation, workflows, testing infrastructure, and project conventions.
 
-- Manifest-driven project metadata (`/home/runner/work/idea-forge/idea-forge/manifests/projects.tsv`)
-- Composable templates (`/home/runner/work/idea-forge/idea-forge/templates/<template-name>`)
-- Modular shell architecture (`/home/runner/work/idea-forge/idea-forge/lib/*.sh`)
-- Reusable CLI (`/home/runner/work/idea-forge/idea-forge/bin/forge`)
-- Optional starter content packs for selected projects
+The system is designed to support long-term collections of related repositories while maintaining consistent engineering practices, documentation standards, and development workflows across an entire organization.
 
-## Template catalog
+Architecture
+
+The project is organized around a small number of reusable components.
+
+idea-forge/
+├── bin/
+│   └── forge
+├── lib/
+├── manifests/
+│   └── projects.tsv
+├── templates/
+│   ├── python-research
+│   ├── rust-library
+│   ├── rust-workspace
+│   ├── c-library
+│   ├── c-kernel
+│   ├── latex-book
+│   ├── latex-paper
+│   ├── javascript-webapp
+│   ├── notebook-laboratory
+│   └── static-website
+├── content-packs/
+└── forge.sh
+
+Project metadata is stored separately from the generation logic. Templates encapsulate reusable project structures, while the command-line interface orchestrates repository creation, template composition, Git initialization, GitHub configuration, and documentation generation.
+
+Template Catalog
+
+Available templates include:
 
 - python-research
 - rust-library
@@ -25,50 +49,71 @@ This project now behaves like a small build system for repository bootstrapping:
 - notebook-laboratory
 - static-website
 
-Templates can be composed per project by listing multiple template IDs in the manifest.
+Projects may combine multiple templates, allowing repositories to inherit functionality from several domains. For example, a computational research project may combine a Python research environment with notebook support and a static documentation website.
 
-## CLI
+Command-Line Interface
 
-```bash
-chmod +x /home/runner/work/idea-forge/idea-forge/bin/forge
+The primary interface is the "forge" executable.
 
-# list manifest projects
-/home/runner/work/idea-forge/idea-forge/bin/forge list
+chmod +x bin/forge
 
-# dry-run one project
-/home/runner/work/idea-forge/idea-forge/bin/forge bootstrap math-machines --dry-run
+# list all configured projects
+bin/forge list
 
-# bootstrap one project without GitHub API calls
-/home/runner/work/idea-forge/idea-forge/bin/forge bootstrap math-machines --no-github
+# preview repository generation
+bin/forge bootstrap math-machines --dry-run
 
-# bootstrap all projects
-/home/runner/work/idea-forge/idea-forge/bin/forge bootstrap all
+# generate without GitHub API operations
+bin/forge bootstrap math-machines --no-github
 
-# apply conventions in an existing repo checkout
-/home/runner/work/idea-forge/idea-forge/bin/forge apply math-machines
-```
+# bootstrap every project
+bin/forge bootstrap all
 
-## Backward compatibility
+# apply repository conventions to an existing checkout
+bin/forge apply math-machines
 
-`/home/runner/work/idea-forge/idea-forge/forge.sh` remains as a wrapper that calls:
+For compatibility with existing workflows, the top-level "forge.sh" script remains available as a convenience wrapper.
 
-```bash
-/home/runner/work/idea-forge/idea-forge/bin/forge bootstrap all
-```
+./forge.sh
 
-## Generated baseline
+Generated Repository Baseline
 
-Every repository receives:
+Every generated repository includes a common organizational foundation consisting of governance documents, project metadata, documentation, testing infrastructure, continuous integration, and development tooling.
 
-- Governance/lifecycle docs: CHANGELOG, ROADMAP, SECURITY, STYLE, AUTHORS, ACKNOWLEDGEMENTS, CODE_OF_CONDUCT, CONTRIBUTING, CITATION
-- Standard `.github` content: issue forms, workflows (`ci`, `lint`, `docs`, `release`), PR template
-- Standard Makefile interface:
-  - `make init`
-  - `make lint`
-  - `make test`
-  - `make benchmark`
-  - `make docs`
-  - `make format`
-  - `make release`
+The generated documentation includes:
 
-Template stacks map these common targets to project-specific internals.
+- CHANGELOG.md
+- ROADMAP.md
+- SECURITY.md
+- STYLE.md
+- AUTHORS.md
+- ACKNOWLEDGEMENTS.md
+- CODE_OF_CONDUCT.md
+- CONTRIBUTING.md
+- CITATION.cff
+
+Each repository also receives a standardized GitHub configuration containing issue templates, pull request templates, and GitHub Actions workflows for continuous integration, documentation, formatting, linting, and releases.
+
+A common "Makefile" interface provides a consistent development experience across all generated repositories.
+
+make init
+make lint
+make test
+make benchmark
+make docs
+make format
+make release
+
+Individual templates map these common commands onto language-specific tooling while preserving a uniform interface for developers.
+
+Content Packs
+
+Templates establish project structure, while optional content packs populate repositories with domain-specific starter material. A content pack may include example implementations, tutorial notebooks, benchmark suites, reference datasets, bibliographies, architecture notes, or introductory papers.
+
+This separation allows multiple projects to share the same engineering template while beginning with completely different technical content.
+
+Design Philosophy
+
+Idea Forge treats repository creation as a reproducible engineering process rather than a manual sequence of setup tasks. Repository metadata is declared once, reusable templates capture organizational conventions, and generated projects begin with documentation, testing, automation, and development infrastructure already in place.
+
+The resulting repositories share a common structure while remaining free to evolve independently according to the needs of their respective research programs.
