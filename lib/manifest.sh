@@ -7,8 +7,10 @@ record_sep=$'\x1f'
 
 load_manifest() {
     local manifest_path="$1"
+    local repo title description topics templates starter_pack summary
     PROJECT_REPOS=()
-    PROJECT_RECORDS=()
+    unset PROJECT_RECORDS
+    declare -gA PROJECT_RECORDS=()
 
     while IFS=$'\t' read -r repo title description topics templates starter_pack summary; do
         [ -z "${repo:-}" ] && continue

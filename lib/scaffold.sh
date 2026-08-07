@@ -15,13 +15,13 @@ $summary
 
 This repository uses a standard make interface:
 
-- \\`make init\\`
-- \\`make lint\\`
-- \\`make test\\`
-- \\`make benchmark\\`
-- \\`make docs\\`
-- \\`make format\\`
-- \\`make release\\`
+- make init
+- make lint
+- make test
+- make benchmark
+- make docs
+- make format
+- make release
 EOF2
 }
 
