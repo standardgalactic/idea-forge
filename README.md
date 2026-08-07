@@ -2,6 +2,36 @@
 
 Template-driven repository forge for research organizations.
 
+## Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/standardgalactic/idea-forge.git
+cd idea-forge
+
+# List all configured projects
+bin/forge list
+
+# Preview what would be generated (dry run)
+bin/forge bootstrap math-machines --dry-run
+
+# Generate a single repository locally
+bin/forge bootstrap math-machines --no-github
+
+# Generate with GitHub integration (requires gh CLI authentication)
+bin/forge bootstrap math-machines
+
+# Generate all repositories from the manifest
+bin/forge bootstrap all
+```
+
+The generated repository will include:
+- Complete documentation (README, LICENSE, CHANGELOG, ROADMAP, etc.)
+- GitHub workflows (CI, linting, documentation, releases)
+- Consistent Makefile interface (`make init`, `make test`, `make lint`)
+- Language-specific tooling and configuration
+- Issue and PR templates
+
 ## Overview
 
 Idea Forge is a repository generation system for creating consistent, well-documented research and software projects from reusable templates. Rather than manually repeating the same setup process for every new repository, projects are described through structured metadata and assembled from composable templates that define language support, documentation, workflows, testing infrastructure, and project conventions.
@@ -57,30 +87,51 @@ Projects may combine multiple templates, allowing repositories to inherit functi
 
 The primary interface is the `forge` executable.
 
-```bash
-chmod +x bin/forge
+### Basic Usage
 
-# List all configured projects
+```bash
+# List configured projects
 bin/forge list
 
-# Preview repository generation
+# Bootstrap a single repository
+bin/forge bootstrap <repo-name> [options]
+
+# Bootstrap all repositories
+bin/forge bootstrap all [options]
+
+# Re-apply templates to existing repository
+bin/forge apply <repo-name>
+```
+
+### Options
+
+```bash
+--manifest path      # Use alternate manifest file (default: manifests/projects.tsv)
+--owner owner        # Set GitHub owner (default: standardgalactic)
+--root path          # Set local root directory (default: ~/github)
+--branch name        # Set default branch (default: main)
+--no-github          # Skip GitHub API operations (local generation only)
+--dry-run           # Preview what would be generated without creating anything
+```
+
+### Examples
+
+```bash
+# Preview generation
 bin/forge bootstrap math-machines --dry-run
 
-# Generate without GitHub API operations
+# Generate locally without GitHub
 bin/forge bootstrap math-machines --no-github
 
-# Bootstrap every project
-bin/forge bootstrap all
+# Generate with custom root directory
+bin/forge bootstrap math-machines --root ~/projects
 
-# Apply repository conventions to an existing checkout
+# Re-apply templates to existing checkout (useful for template updates)
+cd ~/github/math-machines
 bin/forge apply math-machines
 ```
 
-For compatibility with existing workflows, the top-level `forge.sh` script remains available as a convenience wrapper.
-
-```bash
-./forge.sh
-```
+For compatibility with existing workflows, the top-level `forge.sh` script remains available as a convenience wrapper that runs `bin/forge bootstrap all`.
 
 ## Generated Repository Baseline
 

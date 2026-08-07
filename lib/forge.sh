@@ -3,7 +3,10 @@
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 source "$FORGE_ROOT/lib/manifest.sh"
 source "$FORGE_ROOT/lib/template_engine.sh"
-source "$FORGE_ROOT/lib/scaffold.sh"
+source "$FORGE_ROOT/lib/scaffold_base.sh"
+source "$FORGE_ROOT/lib/scaffold_docs.sh"
+source "$FORGE_ROOT/lib/scaffold_github.sh"
+source "$FORGE_ROOT/lib/scaffold_build.sh"
 source "$FORGE_ROOT/lib/starter_packs.sh"
 source "$FORGE_ROOT/lib/github.sh"
 
@@ -48,7 +51,24 @@ forge_generate_project() {
 
     local -a templates
     csv_to_array "$templates_csv" templates
+    
+    # Resolve template dependencies
+    log "Resolving template dependencies..."
+    templates_csv=$(resolve_template_dependencies "$templates_csv")
+    csv_to_array "$templates_csv" templates
+    log "Templates to apply (with dependencies): ${templates[*]}"
+    
+    # Validate all templates before applying any
     for template in "${templates[@]}"; do
+        if ! validate_template "$template"; then
+            err "Template validation failed for: $template"
+            return 1
+        fi
+    done
+    
+    # Apply validated templates
+    for template in "${templates[@]}"; do
+        log "Applying template: $template"
         apply_template "$template" "$repo" "$repo_path" "$package" "$title" "$description"
     done
 
@@ -104,7 +124,52 @@ forge_bootstrap_repo() {
     log "============================================================"
 
     if [ "$dry_run" = "1" ]; then
-        log "Dry run: templates=[$templates] starter_pack=[$starter_pack]"
+        log ""
+        log "DRY RUN - Preview of repository generation"
+        log "=========================================="
+        log ""
+        log "Repository Details:"
+        log "  Name: $repo"
+        log "  Owner: $owner"
+        log "  Title: $title"
+        log "  Description: $description"
+        log "  Path: $root/$repo"
+        log ""
+        log "Templates to Apply:"
+        local -a template_list
+        csv_to_array "$templates" template_list
+        for tmpl in "${template_list[@]}"; do
+            log "  - $tmpl"
+        done
+        log ""
+        if [ -n "$starter_pack" ]; then
+            log "Starter Pack: $starter_pack"
+            log ""
+        fi
+        log "Files to Generate:"
+        log "  - README.md (project description and make commands)"
+        log "  - LICENSE (MIT License)"
+        log "  - .gitignore (multi-language)"
+        log "  - CHANGELOG.md, ROADMAP.md, SECURITY.md"
+        log "  - CODE_OF_CONDUCT.md, CONTRIBUTING.md"
+        log "  - CITATION.cff (citation metadata)"
+        log "  - Makefile (init, lint, test, benchmark, docs, format, release)"
+        log "  - .github/ISSUE_TEMPLATE/ (bug, feature, experiment, docs)"
+        log "  - .github/PULL_REQUEST_TEMPLATE.md"
+        log "  - .github/workflows/ (ci.yml, lint.yml, docs.yml, release.yml)"
+        log "  - docs/ (architecture.md, roadmap.md, bibliography.md)"
+        log ""
+        if [ "$enable_github" = "1" ]; then
+            log "GitHub Operations:"
+            log "  - Create repository if it doesn't exist"
+            log "  - Set description and topics"
+            log "  - Push initial commit to branch: $branch"
+            log "  - Configure labels (experiment, research, etc.)"
+        else
+            log "GitHub Operations: Skipped (--no-github)"
+        fi
+        log ""
+        log "=========================================="
         return 0
     fi
 

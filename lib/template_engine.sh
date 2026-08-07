@@ -46,6 +46,99 @@ _template_to_fn() {
     echo "$1" | tr '-' '_'
 }
 
+validate_template() {
+    local template="$1"
+    local template_dir="$FORGE_ROOT/templates/$template"
+    
+    # Check template directory exists
+    if [ ! -d "$template_dir" ]; then
+        err "Template directory not found: $template_dir"
+        return 1
+    fi
+    
+    # Check template.env exists
+    if [ ! -f "$template_dir/template.env" ]; then
+        err "Missing template.env in $template_dir"
+        return 1
+    fi
+    
+    # Validate template.env format
+    local env_content
+    env_content=$(cat "$template_dir/template.env")
+    if ! grep -q "^TEMPLATE_ID=" "$template_dir/template.env"; then
+        err "Invalid template.env format in $template_dir (missing TEMPLATE_ID=...)"
+        return 1
+    fi
+    
+    # Check template function exists
+    local fn_name="template_apply_$(_template_to_fn "$template")"
+    if ! declare -f "$fn_name" >/dev/null 2>&1; then
+        err "Template function not found: $fn_name"
+        err "Templates must implement: ${fn_name}(repo, repo_path, package, title, description)"
+        return 1
+    fi
+    
+    return 0
+}
+
+get_template_requires() {
+    local template="$1"
+    local template_dir="$FORGE_ROOT/templates/$template"
+    local env_file="$template_dir/template.env"
+    
+    if [ ! -f "$env_file" ]; then
+        return 0
+    fi
+    
+    # Extract TEMPLATE_REQUIRES if it exists
+    local requires
+    requires=$(grep "^TEMPLATE_REQUIRES=" "$env_file" | cut -d= -f2-)
+    printf '%s' "$requires"
+}
+
+resolve_template_dependencies() {
+    local templates_csv="$1"
+    local -a requested_templates resolved_templates seen_templates
+    local -A seen_map
+    
+    csv_to_array "$templates_csv" requested_templates
+    
+    # Recursive dependency resolution
+    resolve_deps() {
+        local template="$1"
+        
+        # Skip if already seen (prevent cycles)
+        if [ -n "${seen_map[$template]:-}" ]; then
+            return 0
+        fi
+        seen_map[$template]=1
+        
+        # Get dependencies
+        local requires
+        requires=$(get_template_requires "$template")
+        
+        # Recursively resolve dependencies first
+        if [ -n "$requires" ]; then
+            local -a deps
+            csv_to_array "$requires" deps
+            for dep in "${deps[@]}"; do
+                resolve_deps "$dep"
+            done
+        fi
+        
+        # Add this template to resolved list
+        resolved_templates+=("$template")
+    }
+    
+    # Resolve all requested templates
+    for template in "${requested_templates[@]}"; do
+        resolve_deps "$template"
+    done
+    
+    # Convert resolved array to CSV
+    (IFS=,; printf '%s' "${resolved_templates[*]}")
+}
+
 apply_template() {
     local template="$1"
     local repo="$2"
