@@ -1,3 +1,5 @@
 # rust-workspace
 
-Composable repository template used by idea-forge.
+Rust Workspace template for idea-forge.
+
+Generates project structure, configuration, and make targets for rust workspace projects.

@@ -70,18 +70,40 @@ Project metadata is stored separately from the generation logic. Templates encap
 
 Available templates include:
 
-- `python-research`
-- `rust-library`
-- `rust-workspace`
-- `c-library`
-- `c-kernel`
-- `latex-book`
-- `latex-paper`
-- `javascript-webapp`
-- `notebook-laboratory`
-- `static-website`
+| Template | Description |
+|----------|-------------|
+| `python-research` | Python research template with pytest, ruff linting, and project structure for computational research |
+| `rust-library` | Single-crate Rust library template with cargo, testing, and documentation support |
+| `rust-workspace` | Multi-crate Rust workspace with shared dependencies and workspace-level commands |
+| `c-library` | C library template with make-based build system and testing support |
+| `c-kernel` | C kernel/OS projects with low-level system programming structure |
+| `latex-book` | LaTeX book template with pdflatex build system and chapter organization |
+| `latex-paper` | LaTeX academic paper template for research publications |
+| `javascript-webapp` | Node.js web application template with npm and modern JavaScript tooling |
+| `notebook-laboratory` | Jupyter notebook environment for interactive research and exploration |
+| `static-website` | Static website template with basic HTTP serving and documentation structure |
+
+To see the full list with descriptions, run:
+```bash
+bin/forge templates
+```
 
 Projects may combine multiple templates, allowing repositories to inherit functionality from several domains. For example, a computational research project may combine a Python research environment with notebook support and a static documentation website.
+
+## Starter Packs
+
+Starter packs populate new repositories with domain-specific example code:
+
+| Starter Pack | Description |
+|--------------|-------------|
+| `math-machines` | Turing machines, lambda calculus, automata, and formal computation models |
+| `constraint-games` | Sudoku, Lights Out, and constraint satisfaction puzzle solvers |
+| `algorithm-zoo` | Sorting, graphs, dynamic programming, and algorithm comparisons |
+
+To see available starter packs, run:
+```bash
+bin/forge starter-packs
+```
 
 ## Command-Line Interface
 

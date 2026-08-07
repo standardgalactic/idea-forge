@@ -9,13 +9,19 @@ usage() {
     cat <<EOF2
 Usage:
   forge list [--manifest path]
+  forge templates
+  forge starter-packs
   forge bootstrap <repo|all> [--manifest path] [--owner owner] [--root path] [--branch name] [--no-github] [--dry-run]
   forge apply <repo> [--manifest path]
+  forge refresh <repo> [--manifest path]
 
 Commands:
-  list       List repositories defined in the manifest.
-  bootstrap  Bootstrap one repository or all repositories from manifest.
-  apply      Re-apply generation in current local repository path for one manifest repo key.
+  list           List repositories defined in the manifest.
+  templates      List available templates with descriptions.
+  starter-packs  List available starter packs.
+  bootstrap      Bootstrap one repository or all repositories from manifest.
+  apply          Re-apply generation in current local repository path for one manifest repo key.
+  refresh        Refresh an existing repository with updated templates (alias for apply).
 EOF2
 }
 
@@ -39,6 +45,14 @@ case "$command" in
             esac
         done
         forge_list "$manifest_path"
+        ;;
+    
+    templates)
+        forge_list_templates
+        ;;
+    
+    starter-packs)
+        forge_list_starter_packs
         ;;
 
     bootstrap)
@@ -71,7 +85,7 @@ case "$command" in
         fi
         ;;
 
-    apply)
+    apply|refresh)
         repo="${1:-}"
         [ -z "$repo" ] && { usage; exit 1; }
         shift
@@ -95,6 +109,7 @@ case "$command" in
         templates="$(project_templates_csv "$repo")"
         starter_pack="$(project_starter_pack "$repo")"
 
+        log "Refreshing repository: $repo"
         forge_generate_project "$owner" "$repo" "$(pwd)" "$title" "$description" "$summary" "$templates" "$starter_pack"
         ;;
 

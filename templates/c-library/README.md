@@ -1,3 +1,5 @@
 # c-library
 
-Composable repository template used by idea-forge.
+C Library template for idea-forge.
+
+Generates project structure, configuration, and make targets for c library projects.

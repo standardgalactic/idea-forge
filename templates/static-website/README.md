@@ -1,3 +1,5 @@
 # static-website
 
-Composable repository template used by idea-forge.
+Static Website template for idea-forge.
+
+Generates project structure, configuration, and make targets for static website projects.

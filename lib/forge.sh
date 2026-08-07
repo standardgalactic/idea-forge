@@ -188,6 +188,44 @@ forge_bootstrap_repo() {
     log "Complete: $owner/$repo"
 }
 
+forge_list_templates() {
+    log "Available Templates"
+    log "==================="
+    log ""
+    
+    for template_dir in "$FORGE_ROOT/templates/"*/; do
+        [ -d "$template_dir" ] || continue
+        local template_name
+        template_name=$(basename "$template_dir")
+        
+        local template_id=""
+        if [ -f "$template_dir/template.env" ]; then
+            template_id=$(grep "^TEMPLATE_ID=" "$template_dir/template.env" | cut -d= -f2-)
+        fi
+        
+        local description="No description available"
+        if [ -f "$template_dir/README.md" ]; then
+            # Extract first non-header line as description
+            description=$(grep -v "^#" "$template_dir/README.md" | grep -v "^$" | head -1 | sed 's/^[[:space:]]*//')
+        fi
+        
+        printf "%-25s %s\n" "$template_name" "$description"
+    done
+}
+
+forge_list_starter_packs() {
+    log "Available Starter Packs"
+    log "======================="
+    log ""
+    
+    # Extract starter pack functions from lib/starter_packs.sh
+    if [ -f "$FORGE_ROOT/lib/starter_packs.sh" ]; then
+        grep "^starter_pack_" "$FORGE_ROOT/lib/starter_packs.sh" | sed 's/starter_pack_//' | sed 's/().*//' | while read -r pack_name; do
+            printf "%-25s\n" "$pack_name"
+        done
+    fi
+}
+
 forge_bootstrap_all() {
     local manifest_path="$1" owner="$2" root="$3" branch="$4" enable_github="$5" dry_run="$6"
 

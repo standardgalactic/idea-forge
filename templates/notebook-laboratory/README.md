@@ -1,3 +1,5 @@
 # notebook-laboratory
 
-Composable repository template used by idea-forge.
+Notebook Laboratory template for idea-forge.
+
+Generates project structure, configuration, and make targets for notebook laboratory projects.

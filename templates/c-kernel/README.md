@@ -1,3 +1,5 @@
 # c-kernel
 
-Composable repository template used by idea-forge.
+C Kernel template for idea-forge.
+
+Generates project structure, configuration, and make targets for c kernel projects.
