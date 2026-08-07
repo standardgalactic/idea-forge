@@ -28,8 +28,7 @@ forge_prepare_repo_dir() {
 
     (
         cd "$path"
-        git init >/dev/null
-        git branch -M "$branch"
+        git init --initial-branch="$branch" >/dev/null
         if [ "$enable_github" = "1" ]; then
             git remote add origin "git@github.com:$owner/$repo.git"
         fi
