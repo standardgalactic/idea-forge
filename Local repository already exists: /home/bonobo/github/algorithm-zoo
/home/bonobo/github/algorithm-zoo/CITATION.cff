@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite the repository."
+title: "Algorithm Zoo"
+type: software
+authors:
+  - family-names: "Flyxion"
+repository-code: "https://github.com/standardgalactic/algorithm-zoo"
+license: MIT
+version: 0.1.0
+date-released: "2026-08-07"
