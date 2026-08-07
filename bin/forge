@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../lib/common.sh"
+source "$SCRIPT_DIR/../lib/forge.sh"
+
+usage() {
+    cat <<EOF2
+Usage:
+  forge list [--manifest path]
+  forge bootstrap <repo|all> [--manifest path] [--owner owner] [--root path] [--branch name] [--no-github] [--dry-run]
+  forge apply <repo> [--manifest path]
+
+Commands:
+  list       List repositories defined in the manifest.
+  bootstrap  Bootstrap one repository or all repositories from manifest.
+  apply      Re-apply generation in current local repository path for one manifest repo key.
+EOF2
+}
+
+manifest_path="$FORGE_ROOT/manifests/projects.tsv"
+owner="$DEFAULT_OWNER"
+root="$DEFAULT_ROOT"
+branch="$DEFAULT_BRANCH"
+enable_github=1
+dry_run=0
+
+command="${1:-}"
+[ -z "$command" ] && { usage; exit 1; }
+shift
+
+case "$command" in
+    list)
+        while [ "$#" -gt 0 ]; do
+            case "$1" in
+                --manifest) manifest_path="$2"; shift 2 ;;
+                *) err "Unknown argument: $1"; exit 1 ;;
+            esac
+        done
+        forge_list "$manifest_path"
+        ;;
+
+    bootstrap)
+        target="${1:-}"
+        [ -z "$target" ] && { usage; exit 1; }
+        shift
+
+        while [ "$#" -gt 0 ]; do
+            case "$1" in
+                --manifest) manifest_path="$2"; shift 2 ;;
+                --owner) owner="$2"; shift 2 ;;
+                --root) root="$2"; shift 2 ;;
+                --branch) branch="$2"; shift 2 ;;
+                --no-github) enable_github=0; shift ;;
+                --dry-run) dry_run=1; shift ;;
+                *) err "Unknown argument: $1"; exit 1 ;;
+            esac
+        done
+
+        require git
+        if [ "$dry_run" = "0" ] && [ "$enable_github" = "1" ]; then
+            gh_require_auth
+        fi
+
+        if [ "$target" = "all" ]; then
+            forge_bootstrap_all "$manifest_path" "$owner" "$root" "$branch" "$enable_github" "$dry_run"
+        else
+            load_manifest "$manifest_path"
+            forge_bootstrap_repo "$manifest_path" "$owner" "$root" "$branch" "$target" "$enable_github" "$dry_run"
+        fi
+        ;;
+
+    apply)
+        repo="${1:-}"
+        [ -z "$repo" ] && { usage; exit 1; }
+        shift
+
+        while [ "$#" -gt 0 ]; do
+            case "$1" in
+                --manifest) manifest_path="$2"; shift 2 ;;
+                *) err "Unknown argument: $1"; exit 1 ;;
+            esac
+        done
+
+        load_manifest "$manifest_path"
+        if ! project_exists "$repo"; then
+            err "Repository not found in manifest: $repo"
+            exit 1
+        fi
+
+        title="$(project_title "$repo")"
+        description="$(project_description "$repo")"
+        summary="$(project_summary "$repo")"
+        templates="$(project_templates_csv "$repo")"
+        starter_pack="$(project_starter_pack "$repo")"
+
+        forge_generate_project "$owner" "$repo" "$(pwd)" "$title" "$description" "$summary" "$templates" "$starter_pack"
+        ;;
+
+    *)
+        usage
+        exit 1
+        ;;
+esac
