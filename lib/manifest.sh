@@ -7,14 +7,25 @@ record_sep=$'\x1f'
 
 load_manifest() {
     local manifest_path="$1"
-    local repo title description topics templates starter_pack summary
+    local repo title description topics templates starter_pack summary line
     PROJECT_REPOS=()
     unset PROJECT_RECORDS
     declare -gA PROJECT_RECORDS=()
 
-    while IFS=$'\t' read -r repo title description topics templates starter_pack summary; do
-        [ -z "${repo:-}" ] && continue
-        [[ "$repo" =~ ^# ]] && continue
+    while IFS= read -r line; do
+        [ -z "$line" ] && continue
+        [[ "$line" =~ ^# ]] && continue
+
+        # Use awk to properly handle empty fields between tabs
+        repo="$(echo "$line" | awk -F'\t' '{print $1}')"
+        title="$(echo "$line" | awk -F'\t' '{print $2}')"
+        description="$(echo "$line" | awk -F'\t' '{print $3}')"
+        topics="$(echo "$line" | awk -F'\t' '{print $4}')"
+        templates="$(echo "$line" | awk -F'\t' '{print $5}')"
+        starter_pack="$(echo "$line" | awk -F'\t' '{print $6}')"
+        summary="$(echo "$line" | awk -F'\t' '{print $7}')"
+
+        [ -z "$repo" ] && continue
 
         PROJECT_REPOS+=("$repo")
         PROJECT_RECORDS["$repo"]="${title}${record_sep}${description}${record_sep}${topics}${record_sep}${templates}${record_sep}${starter_pack}${record_sep}${summary}"
