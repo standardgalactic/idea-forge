@@ -11,6 +11,7 @@ Usage:
   forge list [--manifest path]
   forge templates
   forge starter-packs
+  forge doctor [repo] [--manifest path] [--json]
   forge bootstrap <repo|all> [--manifest path] [--owner owner] [--root path] [--branch name] [--no-github] [--dry-run]
   forge apply <repo> [--manifest path]
   forge refresh <repo> [--manifest path]
@@ -19,6 +20,7 @@ Commands:
   list           List repositories defined in the manifest.
   templates      List available templates with descriptions.
   starter-packs  List available starter packs.
+  doctor         Validate manifest entries, templates, and starter packs without writing files.
   bootstrap      Bootstrap one repository or all repositories from manifest.
   apply          Re-apply generation in current local repository path for one manifest repo key.
   refresh        Refresh an existing repository with updated templates (alias for apply).
@@ -53,6 +55,23 @@ case "$command" in
     
     starter-packs)
         forge_list_starter_packs
+        ;;
+
+    doctor)
+        repo=""
+        json=0
+        if [ "${1:-}" != "" ] && [[ "${1:-}" != --* ]]; then
+            repo="$1"
+            shift
+        fi
+        while [ "$#" -gt 0 ]; do
+            case "$1" in
+                --manifest) manifest_path="$2"; shift 2 ;;
+                --json) json=1; shift ;;
+                *) err "Unknown argument: $1"; exit 1 ;;
+            esac
+        done
+        forge_doctor "$manifest_path" "$repo" "$json"
         ;;
 
     bootstrap)
