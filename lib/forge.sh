@@ -9,6 +9,7 @@ source "$FORGE_ROOT/lib/scaffold_github.sh"
 source "$FORGE_ROOT/lib/scaffold_build.sh"
 source "$FORGE_ROOT/lib/starter_packs.sh"
 source "$FORGE_ROOT/lib/github.sh"
+source "$FORGE_ROOT/lib/doctor.sh"
 
 forge_prepare_repo_dir() {
     local root="$1" repo="$2" branch="$3" owner="$4" enable_github="$5"
