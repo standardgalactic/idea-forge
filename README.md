@@ -12,6 +12,9 @@ cd idea-forge
 # List all configured projects
 bin/forge list
 
+# Validate the manifest and templates before generating anything
+bin/forge doctor
+
 # Preview what would be generated (dry run)
 bin/forge bootstrap math-machines --dry-run
 
@@ -123,6 +126,9 @@ bin/forge bootstrap all [options]
 
 # Re-apply templates to existing repository
 bin/forge apply <repo-name>
+
+# Validate every project, or one named project
+bin/forge doctor [repo-name] [--json]
 ```
 
 ### Options
