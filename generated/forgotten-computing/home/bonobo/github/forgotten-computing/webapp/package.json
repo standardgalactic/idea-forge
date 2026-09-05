@@ -1,0 +1,10 @@
+{
+  "name": "idea-forge-webapp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "lint": "echo \"add js linter\"",
+    "test": "echo \"add js tests\"",
+    "build": "echo \"add js build\""
+  }
+}
